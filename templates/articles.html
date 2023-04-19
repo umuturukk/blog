@@ -5,8 +5,22 @@
 
 <div class = "row">
     <div class="col-md-10 offset-md-3">
-        <h3>Makaleler</h3>
-        <hr>
+        <div class="col-lg-8">
+            <h3>Makaleler</h3>
+            <hr>
+        </div>    
+    </div>
+</div>
+
+<div class = "row">
+    <div class="col-md-10 offset-md-3">
+        <div class="col-lg-8">
+            <form>
+                {% csrf_token %}
+                <input type="text" name = "keyword" class = "input-sm" maxlength = "64" placeholder = "Ara...">
+                <button type = "submit" class = "btn btn-danger">Ara</button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -17,7 +31,7 @@
             <!-- Post Content Column -->
             <div class="col-lg-8">
             <!-- Title -->
-            <a href="/articles/article/{{article.id}}"><h2 class="mt-4"> {{article.title}}</h2></a>
+            <a href="{% url 'article:detail' article.id %}"><h2 class="mt-4"> {{article.title}}</h2></a>
             <!-- Author -->
             <p class="lead">
                 <small><i>{{article.author.username}} tarafından yayınlandı.</i></small>
@@ -28,23 +42,29 @@
             <hr>
             <!-- Preview Image -->
             {% if article.article_image %}
-            <a href="/articles/article/{{article.id}}"><img class="img-fluid rounded" src="{{article.article_image.url}}" alt=""></a>
+            <a href="{% url 'article:detail' article.id %}"><img class="img-fluid rounded" src="{{article.article_image.url}}" alt=""></a>
             {% endif %}
             <hr>
             <!-- Post Content -->
             <p class = "lead">
                 {{article.content|safe|truncatewords:30}}
             </p>
-            <a style = "float : right;" href="/articles/article/{{article.id}}" class = "btn btn-danger"> Devamını Oku</a>
+            <a style = "float : right;" href="{% url 'article:detail' article.id %}" class = "btn btn-danger"> Devamını Oku</a>
             <hr>    
                 </div>
             </div>
         </div>
     {% endfor %}
 {% else %}
+<div class = "row">
+    <div class = "col-md-10 offset-md-3">
+        <div class = "col-lg-8">
     <div class = "alert alert-danger">
-        Bu blogta herhangi bir makale bulunmuyor.
+        Makale Bulunamadı.
     </div>
+</div>
+</div>
+</div>
 {% endif %}
 
 {% endblock body %}

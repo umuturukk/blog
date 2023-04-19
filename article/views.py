@@ -1,12 +1,18 @@
-from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404, reverse
 from django.contrib.auth.decorators import login_required
 from .forms import ArticleForm
-from .models import Article
+from .models import Article, Comment
 from django.contrib import messages
 
 # Create your views here.
 
 def articles(request):
+    keyword = request.GET.get("keyword")
+    if keyword:
+        articles = Article.objects.filter(title__contains = keyword)
+        return render(request, "articles.html", {"articles": articles})
+    
+
     articles = Article.objects.all()
 
     return render(request, "articles.html", {"articles": articles})
@@ -41,7 +47,8 @@ def addArticle(request):
 
 def detail(request, id):
     article = get_object_or_404(Article, id = id)
-    return render(request, "detail.html", {"article": article})
+    comments = article.comments.all()
+    return render(request, "detail.html", {"article": article, "comments": comments})
     
 @login_required(login_url = "user:login")
 def updateArticle(request, id):
@@ -63,3 +70,16 @@ def deleteArticle(request, id):
     article.delete()
     messages.success(request, "Makale başarıyla silindi")
     return redirect("article:dashboard")
+
+
+def addComment(request, id):
+    article = get_object_or_404(Article, id = id)
+    if request.method == "POST":
+        comment_author = request.POST.get("comment_author")
+        comment_content = request.POST.get("comment_content")
+
+        newComment = Comment(comment_author = comment_author, comment_content = comment_content)
+        newComment.article = article
+        newComment.save()
+
+    return redirect(reverse("article:detail", kwargs = {"id": id})) # /articles/detail/15 
